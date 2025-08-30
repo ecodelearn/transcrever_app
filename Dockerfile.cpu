@@ -1,0 +1,66 @@
+# Dockerfile CPU-only para Transcritor com Diarização
+# Versão otimizada para sistemas sem GPU
+
+FROM python:3.10-slim-bullseye
+
+# Evitar prompts interativos durante instalação
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    git \
+    wget \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Criar usuário não-root para segurança
+RUN useradd -m -u 1000 transcriptor && \
+    mkdir -p /app /input /output && \
+    chown -R transcriptor:transcriptor /app /input /output
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY requirements.txt .
+
+# Instalar dependências Python (versão CPU do PyTorch)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copiar código fonte
+COPY . .
+
+# Ajustar permissões
+RUN chown -R transcriptor:transcriptor /app
+
+# Mudar para usuário não-root
+USER transcriptor
+
+# Criar diretórios de trabalho
+RUN mkdir -p /app/output /app/temp
+
+# Definir volumes
+VOLUME ["/input", "/output"]
+
+# Variáveis de ambiente padrão
+ENV INPUT_DIR=/input
+ENV OUTPUT_DIR=/output
+ENV TEMP_DIR=/app/temp
+ENV HF_HOME=/app/.cache/huggingface
+ENV TORCH_HOME=/app/.cache/torch
+ENV USE_GPU=false
+
+# Comando padrão
+ENTRYPOINT ["python3", "transcrever.py"]
+CMD ["--help"]
+
+# Labels para metadata
+LABEL maintainer="Transcritor Team"
+LABEL version="1.0-cpu"
+LABEL description="Transcritor CPU-only para Português Brasileiro"
+LABEL gpu.required="false"

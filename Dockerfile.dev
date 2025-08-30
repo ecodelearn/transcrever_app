@@ -1,0 +1,74 @@
+# Dockerfile para desenvolvimento do Transcritor
+# Inclui ferramentas de desenvolvimento e hot-reload
+
+FROM python:3.10-slim-bullseye
+
+# Evitar prompts interativos durante instalação
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    git \
+    wget \
+    curl \
+    build-essential \
+    vim \
+    nano \
+    htop \
+    tree \
+    && rm -rf /var/lib/apt/lists/*
+
+# Criar usuário não-root para desenvolvimento
+RUN useradd -m -u 1000 transcriptor && \
+    mkdir -p /app /input /output && \
+    chown -R transcriptor:transcriptor /app /input /output
+
+# Definir diretório de trabalho
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY requirements.txt .
+COPY requirements-dev.txt .
+
+# Instalar dependências Python (CPU version for dev)
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r requirements-dev.txt
+
+# Ajustar permissões
+RUN chown -R transcriptor:transcriptor /app
+
+# Mudar para usuário não-root
+USER transcriptor
+
+# Criar diretórios de trabalho
+RUN mkdir -p /app/output /app/temp /app/logs
+
+# Definir volumes para desenvolvimento
+VOLUME ["/app", "/input", "/output"]
+
+# Variáveis de ambiente para desenvolvimento
+ENV INPUT_DIR=/input
+ENV OUTPUT_DIR=/output
+ENV TEMP_DIR=/app/temp
+ENV HF_HOME=/app/.cache/huggingface
+ENV TORCH_HOME=/app/.cache/torch
+ENV USE_GPU=false
+ENV PYTHONPATH=/app
+ENV FLASK_ENV=development
+ENV FLASK_DEBUG=1
+
+# Expor portas para desenvolvimento
+EXPOSE 8000 5000
+
+# Comando padrão para desenvolvimento
+CMD ["python3", "-c", "print('🔧 Ambiente de desenvolvimento pronto!'); import time; time.sleep(999999)"]
+
+# Labels para metadata
+LABEL maintainer="Transcritor Team"
+LABEL version="1.0-dev"
+LABEL description="Ambiente de desenvolvimento para Transcritor"
+LABEL environment="development"

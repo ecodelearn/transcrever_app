@@ -1,0 +1,37 @@
+# Core dependencies for transcription
+openai-whisper==20231117
+torch>=2.0.0
+torchaudio>=2.0.0
+pyannote.audio>=3.1.0
+
+# Audio processing
+librosa>=0.10.0
+soundfile>=0.12.0
+pydub>=0.25.0
+
+# Environment and configuration
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# Utilities
+numpy>=1.24.0
+pandas>=2.0.0
+tqdm>=4.65.0
+
+# Optional: GPU acceleration (NVIDIA)
+# Uncomment if you have NVIDIA GPU and want to use CUDA
+# torch[gpu]>=2.0.0
+# torchaudio[gpu]>=2.0.0
+
+# Optional: Intel GPU acceleration
+# Uncomment if you have Intel GPU
+# intel-extension-for-pytorch>=2.0.0
+
+# Development dependencies (optional)
+jupyter>=1.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# CLI interface improvements
+rich>=13.0.0
+click>=8.1.0

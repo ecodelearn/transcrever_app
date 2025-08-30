@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  transcritor:
+    build: .
+    container_name: transcritor-main
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - WHISPER_MODEL=${WHISPER_MODEL:-medium}
+      - WHISPER_LANGUAGE=${WHISPER_LANGUAGE:-pt}
+      - OUTPUT_FORMAT=${OUTPUT_FORMAT:-txt}
+      - USE_GPU=${USE_GPU:-true}
+      - NUM_SPEAKERS=${NUM_SPEAKERS:-auto}
+    volumes:
+      - ./input:/input:ro
+      - ./output:/output:rw
+      - ./temp:/app/temp:rw
+      - huggingface_cache:/app/.cache/huggingface
+      - torch_cache:/app/.cache/torch
+    env_file:
+      - .env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    networks:
+      - transcritor-network
+    restart: unless-stopped
+
+  # Versão CPU-only para sistemas sem GPU
+  transcritor-cpu:
+    build: 
+      context: .
+      dockerfile: Dockerfile.cpu
+    container_name: transcritor-cpu
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - WHISPER_MODEL=${WHISPER_MODEL:-small}
+      - WHISPER_LANGUAGE=${WHISPER_LANGUAGE:-pt}
+      - OUTPUT_FORMAT=${OUTPUT_FORMAT:-txt}
+      - USE_GPU=false
+      - NUM_SPEAKERS=${NUM_SPEAKERS:-auto}
+    volumes:
+      - ./input:/input:ro
+      - ./output:/output:rw
+      - ./temp:/app/temp:rw
+      - huggingface_cache:/app/.cache/huggingface
+      - torch_cache:/app/.cache/torch
+    env_file:
+      - .env
+    networks:
+      - transcritor-network
+    restart: unless-stopped
+    profiles:
+      - cpu
+
+  # Serviço de desenvolvimento com hot-reload
+  transcritor-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: transcritor-dev
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - WHISPER_MODEL=${WHISPER_MODEL:-small}
+      - WHISPER_LANGUAGE=${WHISPER_LANGUAGE:-pt}
+      - OUTPUT_FORMAT=${OUTPUT_FORMAT:-txt}
+      - USE_GPU=${USE_GPU:-false}
+      - PYTHONPATH=/app
+    volumes:
+      - .:/app:rw
+      - ./input:/input:ro
+      - ./output:/output:rw
+      - ./temp:/app/temp:rw
+      - huggingface_cache:/app/.cache/huggingface
+      - torch_cache:/app/.cache/torch
+    env_file:
+      - .env
+    networks:
+      - transcritor-network
+    restart: unless-stopped
+    profiles:
+      - dev
+    command: python3 transcrever.py
+
+volumes:
+  huggingface_cache:
+    driver: local
+  torch_cache:
+    driver: local
+
+networks:
+  transcritor-network:
+    driver: bridge
+
+# Configurações para diferentes perfis
+x-common-variables: &common-variables
+  HF_TOKEN: ${HF_TOKEN}
+  WHISPER_LANGUAGE: pt
+  OUTPUT_DIR: /output
+  INPUT_DIR: /input

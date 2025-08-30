@@ -1,0 +1,15 @@
+=== TRANSCRIÇÃO COM DIARIZAÇÃO ===
+
+[00:00:05] SPEAKER_00: Bom dia, pessoal. Vamos começar nossa reunião de hoje.
+[00:00:12] SPEAKER_01: Bom dia! Estou pronto para discutir os pontos da pauta.
+[00:00:18] SPEAKER_00: Perfeito. Hoje vamos revisar os resultados do último trimestre e planejar as ações para o próximo período.
+[00:00:26] SPEAKER_02: Excelente. Tenho aqui os números consolidados que vocês solicitaram.
+[00:00:32] SPEAKER_01: Ótimo. Podemos começar pela análise de vendas?
+[00:00:37] SPEAKER_00: Claro. Speaker_02, você pode apresentar os dados?
+[00:00:42] SPEAKER_02: Sim, com certeza. No último trimestre, tivemos um crescimento de quinze por cento nas vendas totais.
+[00:00:49] SPEAKER_01: Isso é muito bom! Qual foi o principal fator para esse crescimento?
+[00:00:54] SPEAKER_02: Principalmente o lançamento do novo produto e a campanha de marketing digital que implementamos.
+[00:01:02] SPEAKER_00: Interessante. E como está a performance por região?
+[00:01:07] SPEAKER_02: A região Sudeste continua sendo nossa melhor performance, mas o Nordeste mostrou um crescimento surpreendente.
+[00:01:15] SPEAKER_01: Que ótima notícia! Precisamos investir mais nessas regiões promissoras.
+[00:01:21] SPEAKER_00: Concordo plenamente. Vamos discutir o orçamento para o próximo trimestre então.
